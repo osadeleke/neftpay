@@ -1,0 +1,10 @@
+name = "neftrack"
+main = ".open-next/worker.js"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+# Cloudflare D1 Database Binding
+[[d1_databases]]
+binding = "DB"
+database_name = "neftrack-db"
+database_id = "b202c80b-06b7-41f4-bc2c-eab4820e6350"
