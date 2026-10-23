@@ -9,10 +9,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 2. Allow auth endpoints, login page, admin portal, and static assets
+  // 2. Allow auth endpoints, login, signup, admin portal, and static assets
   if (
     pathname.startsWith("/api/auth") ||
     pathname.startsWith("/login") ||
+    pathname.startsWith("/signup") ||
     pathname.startsWith("/admin") ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/favicon.ico") ||
@@ -21,21 +22,22 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 3. Root path redirects to /dashboard
-  if (pathname === "/") {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
-  }
-
-  // 4. In development, allow seamless access to dashboard/agreements/settings
-  // Check for session cookie if present
+  // Check for session cookie
   const sessionToken =
     request.cookies.get("neft_session")?.value ||
     request.cookies.get("next-auth.session-token")?.value ||
     request.cookies.get("__Secure-next-auth.session-token")?.value;
 
-  // If in strict mode without session, redirect to login
-  // Note: during local testing, default session is automatically served if not set.
-  if (!sessionToken && process.env.STRICT_AUTH === "true") {
+  // 3. Root landing page: redirect to /dashboard if logged in, otherwise show landing page
+  if (pathname === "/") {
+    if (sessionToken) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+    return NextResponse.next();
+  }
+
+  // 4. Enforce authentication on all protected merchant routes
+  if (!sessionToken) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("from", pathname);
     return NextResponse.redirect(loginUrl);

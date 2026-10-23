@@ -28,12 +28,12 @@ export function AgreementCard({ agreement, showQuickRemind = true }: AgreementCa
   const whatsappUrl = buildWhatsAppLink(agreement.client_phone, reminderText);
 
   return (
-    <Card className="group relative overflow-hidden transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md">
+    <Card className="group relative overflow-hidden transition-all duration-200 hover:border-emerald-500/40 dark:hover:border-emerald-500/30 hover:shadow-lg">
       <Link href={`/agreements/${agreement.id}`} className="block p-4 sm:p-5">
         {/* Top Header: Client & Status Pill */}
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
-            <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate group-hover:text-emerald-600 transition-colors">
+            <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate group-hover:text-emerald-600 dark:group-hover:text-[#00D084] transition-colors">
               {agreement.client_name}
             </h4>
             <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">
@@ -60,12 +60,12 @@ export function AgreementCard({ agreement, showQuickRemind = true }: AgreementCa
 
         {/* Amount & Progress */}
         <div className="mt-3.5 space-y-1.5">
-          <div className="flex items-baseline justify-between text-xs">
+          <div className="flex items-baseline justify-between text-xs font-money">
             <span className="font-semibold text-slate-700 dark:text-slate-300">
               {formatNaira(agreement.total_paid)}
               <span className="text-slate-400 font-normal"> / {formatNaira(agreement.total_amount)}</span>
             </span>
-            <span className="font-bold text-slate-900 dark:text-slate-100">
+            <span className="font-bold text-slate-900 dark:text-white">
               {agreement.percent_paid}%
             </span>
           </div>
@@ -74,25 +74,25 @@ export function AgreementCard({ agreement, showQuickRemind = true }: AgreementCa
             value={agreement.percent_paid}
             indicatorColor={
               isCompleted
-                ? "bg-teal-500"
+                ? "bg-gradient-to-r from-teal-500 to-cyan-400"
                 : isOverdue
-                ? "bg-rose-500"
-                : "bg-emerald-500"
+                ? "bg-gradient-to-r from-rose-500 to-pink-500"
+                : "bg-gradient-to-r from-emerald-500 via-teal-400 to-[#00D084]"
             }
           />
         </div>
 
         {/* Footer info: Balance remaining & chevron */}
-        <div className="mt-3 flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs">
+        <div className="mt-3 flex items-center justify-between pt-2.5 border-t border-slate-100 dark:border-slate-800/80 text-xs">
           <div className="text-slate-500 dark:text-slate-400">
             {isCompleted ? (
-              <span className="text-teal-600 dark:text-teal-400 font-semibold">
+              <span className="text-teal-600 dark:text-teal-400 font-bold">
                 Fully Settled
               </span>
             ) : (
               <>
                 Balance:{" "}
-                <span className="font-extrabold text-slate-900 dark:text-white">
+                <span className="font-extrabold text-slate-900 dark:text-white font-money">
                   {formatNaira(agreement.balance_remaining)}
                 </span>
               </>
@@ -106,10 +106,10 @@ export function AgreementCard({ agreement, showQuickRemind = true }: AgreementCa
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#128C7E] dark:text-[#25D366] text-xs font-semibold transition-colors"
+                className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#25D366]/15 hover:bg-[#25D366]/25 text-[#075E54] dark:text-[#25D366] text-xs font-bold border border-[#25D366]/30 transition-all active:scale-95"
                 title="Send WhatsApp Reminder"
               >
-                <MessageCircle className="h-3.5 w-3.5" />
+                <MessageCircle className="h-3.5 w-3.5 fill-current" />
                 <span>Remind</span>
               </a>
             )}

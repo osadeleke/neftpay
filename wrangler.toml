@@ -8,3 +8,9 @@ compatibility_flags = ["nodejs_compat"]
 binding = "DB"
 database_name = "neftrack-db"
 database_id = "b202c80b-06b7-41f4-bc2c-eab4820e6350"
+
+# Cloudflare Email Service Binding
+send_email = [
+  { name = "EMAIL" }
+]
+

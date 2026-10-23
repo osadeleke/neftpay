@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { createAgreementAction } from "@/actions/agreements";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, User, Phone, ShoppingBag, Calendar } from "lucide-react";
+import { CheckCircle2, User, Phone, ShoppingBag, Calendar, Mail } from "lucide-react";
 
 interface NewAgreementSheetProps {
   isOpen: boolean;
@@ -119,6 +119,13 @@ export function NewAgreementSheet({ isOpen, onClose }: NewAgreementSheetProps) {
             prefixNode={<Phone className="h-4 w-4" />}
             type="tel"
             required
+          />
+          <Input
+            placeholder="Customer Email (Optional - auto-sends digital receipt)"
+            value={formData.clientEmail}
+            onChange={(e) => handleChange("clientEmail", e.target.value)}
+            prefixNode={<Mail className="h-4 w-4" />}
+            type="email"
           />
         </div>
 

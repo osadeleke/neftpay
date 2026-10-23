@@ -39,8 +39,7 @@ export async function verifySessionToken(token: string): Promise<SessionUser | n
 
 /**
  * Retrieves the currently authenticated merchant session from HTTP-only cookies.
- * Falls back to default demo merchant in development if no cookie is set yet,
- * or returns null.
+ * Returns null if the user is not authenticated.
  */
 export async function getSession(): Promise<SessionUser | null> {
   const cookieStore = await cookies();
@@ -51,15 +50,7 @@ export async function getSession(): Promise<SessionUser | null> {
     if (verified) return verified;
   }
 
-  // In development, if no cookie exists, default to Adebayo Electronics demo merchant
-  // so the reviewer can instantly preview the fully loaded dashboard
-  return {
-    id: DEMO_MERCHANT_ID,
-    email: "adebayo@electronics.ng",
-    name: "Adebayo Alabi",
-    business_name: "Adebayo Electronics & Solar",
-    phone_number: "08035552341",
-  };
+  return null;
 }
 
 /**

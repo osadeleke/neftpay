@@ -2,7 +2,12 @@
 
 :root {
   --background: #f8fafc;
-  --foreground: #0f172a;
+  --foreground: #090d16;
+  --card-bg: #ffffff;
+  --card-border: rgba(226, 232, 240, 0.9);
+  --primary-emerald: #008751;
+  --jade-vivid: #00D084;
+  --mint-cyan: #06B6D4;
 }
 
 @theme inline {
@@ -14,8 +19,10 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #020617;
-    --foreground: #f8fafc;
+    --background: #070B12;
+    --foreground: #F8FAFC;
+    --card-bg: #0F172A;
+    --card-border: rgba(255, 255, 255, 0.08);
   }
 }
 
@@ -41,12 +48,47 @@ body {
   scrollbar-width: none;
 }
 
+/* Custom Fintech Glows & Glassmorphism */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.dark .glass-panel {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hero-gradient {
+  background: linear-gradient(135deg, #09121E 0%, #061A28 45%, #05291E 100%);
+}
+
+.hero-glow-emerald {
+  box-shadow: 0 10px 30px -10px rgba(0, 208, 132, 0.35);
+}
+
+.whatsapp-glow {
+  box-shadow: 0 4px 18px -2px rgba(37, 211, 102, 0.35);
+}
+
+/* Tabular figures for crisp financial ledger numbers */
+.font-money {
+  font-feature-settings: "tnum" 1, "cv05" 1;
+  letter-spacing: -0.02em;
+}
+
 @keyframes pulseSlow {
   0%, 100% {
     opacity: 1;
+    transform: scale(1);
   }
   50% {
-    opacity: 0.6;
+    opacity: 0.7;
+    transform: scale(0.98);
   }
 }
 

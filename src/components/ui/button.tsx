@@ -10,7 +10,8 @@ export interface ButtonProps
     | "outline"
     | "ghost"
     | "whatsapp"
-    | "link";
+    | "link"
+    | "amber";
   size?: "default" | "sm" | "lg" | "icon" | "full";
   isLoading?: boolean;
 }
@@ -18,26 +19,29 @@ export interface ButtonProps
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "default", size = "default", isLoading, children, disabled, ...props }, ref) => {
     const baseStyles =
-      "inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-semibold ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]";
+      "inline-flex items-center justify-center whitespace-nowrap rounded-2xl text-sm font-bold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]";
 
     const variantStyles = {
       default:
-        "bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm shadow-emerald-600/30 dark:bg-emerald-600 dark:hover:bg-emerald-700",
+        "bg-gradient-to-r from-emerald-600 via-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-md shadow-emerald-600/25 dark:shadow-emerald-900/40",
       secondary:
-        "bg-slate-100 text-slate-900 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700",
+        "bg-slate-100 text-slate-800 hover:bg-slate-200 dark:bg-slate-800/80 dark:text-slate-100 dark:hover:bg-slate-700/80 border border-slate-200/80 dark:border-slate-700/60",
       destructive:
-        "bg-rose-600 text-white hover:bg-rose-700 shadow-sm shadow-rose-600/20",
+        "bg-gradient-to-r from-rose-600 to-pink-600 text-white hover:from-rose-500 hover:to-pink-500 shadow-md shadow-rose-600/25",
+      amber:
+        "bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-400 hover:to-orange-400 shadow-md shadow-amber-500/25",
       outline:
-        "border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800",
-      ghost: "hover:bg-slate-100 text-slate-700 dark:hover:bg-slate-800 dark:text-slate-300",
+        "border border-slate-200/80 bg-white hover:bg-slate-50 text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800/80 shadow-sm",
+      ghost:
+        "hover:bg-slate-100 text-slate-700 dark:hover:bg-slate-800 dark:text-slate-300",
       whatsapp:
-        "bg-[#25D366] text-white hover:bg-[#20ba5a] shadow-sm shadow-[#25D366]/30 font-bold",
-      link: "text-emerald-600 underline-offset-4 hover:underline dark:text-emerald-400 p-0 h-auto",
+        "bg-[#25D366] text-white hover:bg-[#20ba5a] shadow-md shadow-[#25D366]/30 font-bold tracking-tight",
+      link: "text-emerald-600 underline-offset-4 hover:underline dark:text-emerald-400 p-0 h-auto font-semibold",
     };
 
     const sizeStyles = {
-      default: "h-11 px-4 py-2",
-      sm: "h-9 rounded-lg px-3 text-xs",
+      default: "h-11 px-5 py-2.5",
+      sm: "h-9 rounded-xl px-3.5 text-xs",
       lg: "h-13 rounded-2xl px-6 text-base",
       icon: "h-10 w-10",
       full: "w-full h-12 py-3 px-4",

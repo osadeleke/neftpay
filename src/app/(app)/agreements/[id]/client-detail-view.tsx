@@ -102,7 +102,7 @@ export function ClientDetailView({ agreement, payments }: ClientDetailViewProps)
           />
         </div>
 
-        <div className="mt-4 grid grid-cols-3 gap-2 pt-3 border-t border-slate-100 dark:border-slate-800 text-center">
+        <div className="mt-4 grid grid-cols-3 gap-2 pt-3 border-t border-slate-100 dark:border-slate-800 text-center font-money">
           <div>
             <div className="text-[10px] uppercase font-bold text-slate-400">Total</div>
             <div className="text-xs sm:text-sm font-extrabold text-slate-800 dark:text-slate-200 mt-0.5">
@@ -110,8 +110,8 @@ export function ClientDetailView({ agreement, payments }: ClientDetailViewProps)
             </div>
           </div>
           <div>
-            <div className="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400">Paid</div>
-            <div className="text-xs sm:text-sm font-extrabold text-emerald-600 dark:text-emerald-400 mt-0.5">
+            <div className="text-[10px] uppercase font-bold text-emerald-600 dark:text-[#00D084]">Paid</div>
+            <div className="text-xs sm:text-sm font-extrabold text-emerald-600 dark:text-[#00D084] mt-0.5">
               {formatNaira(agreement.total_paid)}
             </div>
           </div>
@@ -144,10 +144,10 @@ export function ClientDetailView({ agreement, payments }: ClientDetailViewProps)
       </div>
 
       {/* 3. Sticky Footer Button spanning 100% width: "Log New Payment" (Requirement 3: Screen 3) */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 mx-auto max-w-md p-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200/90 dark:border-slate-800 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+      <div className="fixed bottom-0 left-0 right-0 z-30 mx-auto max-w-md p-4 bg-white/90 dark:bg-[#0B111E]/95 backdrop-blur-xl border-t border-slate-200/70 dark:border-slate-800/80 shadow-[0_-8px_30px_rgba(0,0,0,0.08)]">
         <button
           onClick={() => setIsLogModalOpen(true)}
-          className="w-full h-13 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold text-base flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 transition-all"
+          className="w-full h-13 rounded-2xl bg-gradient-to-r from-emerald-600 via-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-[0.98] text-white font-bold text-base flex items-center justify-center gap-2 shadow-xl shadow-emerald-600/35 transition-all"
         >
           <PlusCircle className="h-5 w-5" />
           <span>Log New Payment</span>

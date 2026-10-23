@@ -120,34 +120,34 @@ export function ReceiptView({ data }: ReceiptViewProps) {
 
         {/* Hero Card: Remaining Balance (Huge Font) */}
         <div
-          className={`relative overflow-hidden rounded-3xl p-6 text-white shadow-xl ${
+          className={`relative overflow-hidden rounded-3xl p-6 sm:p-7 text-white shadow-2xl ${
             isCompleted
-              ? "bg-gradient-to-br from-teal-700 via-emerald-800 to-slate-900 shadow-teal-700/20"
-              : "bg-gradient-to-br from-emerald-800 via-slate-900 to-slate-950 shadow-emerald-900/30"
+              ? "bg-gradient-to-br from-slate-900 via-teal-950 to-slate-900 border border-teal-500/40 shadow-teal-900/30"
+              : "hero-gradient border border-emerald-500/35 hero-glow-emerald"
           }`}
         >
-          {/* Subtle Background Accent */}
-          <div className="absolute -top-12 -right-12 h-44 w-44 rounded-full bg-emerald-500/10 blur-3xl" />
+          {/* Subtle Ambient Radial Glow */}
+          <div className="absolute -top-12 -right-12 h-44 w-44 rounded-full bg-[#00D084]/15 blur-3xl" />
 
           <div className="relative z-10 flex flex-col items-center text-center">
             {isCompleted ? (
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-400/20 text-teal-200 text-xs font-bold mb-2">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-400/20 text-teal-300 text-xs font-bold mb-2 border border-teal-400/30">
                 <CheckCircle2 className="h-4 w-4" />
                 <span>PAYMENT COMPLETE & SETTLED</span>
               </div>
             ) : (
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-400/20 text-emerald-200 text-xs font-bold mb-2">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 dark:text-[#00D084] text-xs font-bold mb-2 border border-emerald-500/30">
                 <Clock className="h-3.5 w-3.5" />
                 <span>REMAINING BALANCE</span>
               </div>
             )}
 
             {/* Hero Text: Remaining Balance (Huge Font) */}
-            <div className="text-4xl sm:text-5xl font-black tracking-tight mt-1 text-white">
+            <div className="text-4xl sm:text-5xl font-black tracking-tight mt-1 text-white font-money">
               {formatNaira(balanceRemainingKobo)}
             </div>
 
-            <p className="text-xs text-slate-300 mt-2">
+            <p className="text-xs text-slate-300 mt-2 font-medium">
               {isCompleted
                 ? "All scheduled installments have been paid in full."
                 : `₦${(totalPaidKobo / 100).toLocaleString()} already paid (${percentPaid}%)`}
@@ -156,8 +156,10 @@ export function ReceiptView({ data }: ReceiptViewProps) {
             {/* Progress Bar inside hero */}
             <div className="w-full mt-5 bg-white/10 h-2.5 rounded-full overflow-hidden p-0.5">
               <div
-                className={`h-full rounded-full transition-all duration-700 ${
-                  isCompleted ? "bg-teal-400" : "bg-emerald-400"
+                className={`h-full rounded-full transition-all duration-700 shadow-sm ${
+                  isCompleted
+                    ? "bg-gradient-to-r from-teal-400 to-cyan-400"
+                    : "bg-gradient-to-r from-emerald-500 via-teal-400 to-[#00D084]"
                 }`}
                 style={{ width: `${percentPaid}%` }}
               />

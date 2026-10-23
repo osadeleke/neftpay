@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireMerchantId } from "@/lib/auth/session";
+import { requireMerchantId, getSession } from "@/lib/auth/session";
 import {
   createAgreement as dbCreateAgreement,
   getAgreementById as dbGetAgreementById,
@@ -12,6 +12,10 @@ import {
   logPayment as dbLogPayment,
 } from "@/lib/db/queries";
 import { nairaToKobo } from "@/lib/utils";
+import {
+  triggerAgreementCreatedEmail,
+  triggerPaymentReceiptEmail,
+} from "@/lib/email/service";
 
 /**
  * 1. createAgreement
@@ -62,6 +66,24 @@ export async function createAgreementAction(formData: {
     revalidatePath("/dashboard");
     revalidatePath("/agreements");
 
+    // Trigger customer confirmation email if customer email is provided
+    if (formData.clientEmail) {
+      getSession().then((session) => {
+        const businessName = session?.business_name || session?.name || "Merchant Store";
+        triggerAgreementCreatedEmail({
+          clientEmail: formData.clientEmail!,
+          clientName: formData.clientName,
+          businessName,
+          itemTitle: formData.title,
+          totalAmountKobo,
+          depositKobo: initialDepositKobo,
+          balanceKobo: agreement.balance_remaining,
+          dueDate: formData.dueDate,
+          magicLinkSlug: agreement.magic_link_slug,
+        }).catch((err) => console.error("Agreement created email warning:", err));
+      });
+    }
+
     return { success: true, agreement };
   } catch (err: any) {
     console.error("createAgreementAction error:", err);
@@ -100,6 +122,26 @@ export async function logPaymentAction(params: {
     revalidatePath(`/agreements/${params.agreementId}`);
     if (result.agreement?.magic_link_slug) {
       revalidatePath(`/c/${result.agreement.magic_link_slug}`);
+    }
+
+    // Trigger payment receipt email if customer has an email attached
+    if (result.agreement?.client_email) {
+      getSession().then((session) => {
+        const businessName = session?.business_name || session?.name || "Merchant Store";
+        triggerPaymentReceiptEmail({
+          clientEmail: result.agreement.client_email!,
+          clientName: result.agreement.client_name,
+          businessName,
+          itemTitle: result.agreement.title,
+          amountPaidKobo: amountKobo,
+          paymentMethod: params.paymentMethod,
+          totalPaidKobo: result.agreement.total_paid,
+          totalAmountKobo: result.agreement.total_amount,
+          balanceKobo: result.agreement.balance_remaining,
+          percentPaid: result.agreement.percent_paid,
+          magicLinkSlug: result.agreement.magic_link_slug,
+        }).catch((err) => console.error("Payment receipt email warning:", err));
+      });
     }
 
     return { success: true, payment: result.payment, agreement: result.agreement };

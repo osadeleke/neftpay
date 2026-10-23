@@ -22,7 +22,7 @@ export function GlobalFAB() {
       <div className="fixed bottom-20 right-4 z-40 sm:right-[max(1rem,calc(50%-13rem))]">
         <button
           onClick={() => setIsMenuOpen(true)}
-          className="group relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white shadow-lg shadow-emerald-600/40 hover:shadow-xl hover:shadow-emerald-600/50 hover:scale-105 active:scale-95 transition-all duration-200"
+          className="group relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-emerald-600 via-emerald-500 to-[#00D084] text-white shadow-xl shadow-emerald-600/35 hover:shadow-emerald-500/50 hover:scale-105 active:scale-95 transition-all duration-200"
           aria-label="Quick Actions"
         >
           <Plus className="h-7 w-7 stroke-[2.5] transition-transform duration-200 group-hover:rotate-90" />
