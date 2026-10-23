@@ -10,6 +10,8 @@ import {
   getDashboardStats as dbGetDashboardStats,
   getMagicLinkData as dbGetMagicLinkData,
   logPayment as dbLogPayment,
+  updateAgreement as dbUpdateAgreement,
+  deletePayment as dbDeletePayment,
 } from "@/lib/db/queries";
 import { nairaToKobo } from "@/lib/utils";
 import {
@@ -214,3 +216,78 @@ export async function getClientsListAction() {
     return { success: false, error: err.message };
   }
 }
+
+export async function updateAgreementAction(params: {
+  agreementId: string;
+  title: string;
+  totalAmountNaira: number | string;
+  dueDate?: string;
+  notes?: string;
+  clientName: string;
+  clientPhone: string;
+  clientEmail?: string;
+}) {
+  try {
+    const merchantId = await requireMerchantId();
+    const totalAmountKobo = nairaToKobo(params.totalAmountNaira);
+
+    if (!params.title || !params.clientName || !params.clientPhone) {
+      return { success: false, error: "Title, client name, and phone are required." };
+    }
+
+    if (totalAmountKobo <= 0) {
+      return { success: false, error: "Total amount must be greater than ₦0." };
+    }
+
+    const updated = await dbUpdateAgreement({
+      merchantId,
+      agreementId: params.agreementId,
+      title: params.title,
+      totalAmountKobo,
+      dueDate: params.dueDate,
+      notes: params.notes,
+      clientName: params.clientName,
+      clientPhone: params.clientPhone,
+      clientEmail: params.clientEmail,
+    });
+
+    revalidatePath("/dashboard");
+    revalidatePath("/agreements");
+    revalidatePath(`/agreements/${params.agreementId}`);
+    if (updated.magic_link_slug) {
+      revalidatePath(`/c/${updated.magic_link_slug}`);
+    }
+
+    return { success: true, agreement: updated };
+  } catch (err: any) {
+    console.error("updateAgreementAction error:", err);
+    return { success: false, error: err.message || "Failed to update agreement." };
+  }
+}
+
+export async function deletePaymentAction(params: {
+  agreementId: string;
+  paymentId: string;
+}) {
+  try {
+    const merchantId = await requireMerchantId();
+    const result = await dbDeletePayment({
+      merchantId,
+      agreementId: params.agreementId,
+      paymentId: params.paymentId,
+    });
+
+    revalidatePath("/dashboard");
+    revalidatePath("/agreements");
+    revalidatePath(`/agreements/${params.agreementId}`);
+    if (result.agreement?.magic_link_slug) {
+      revalidatePath(`/c/${result.agreement.magic_link_slug}`);
+    }
+
+    return { success: true, agreement: result.agreement };
+  } catch (err: any) {
+    console.error("deletePaymentAction error:", err);
+    return { success: false, error: err.message || "Failed to delete payment." };
+  }
+}
+

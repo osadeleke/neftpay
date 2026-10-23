@@ -1,13 +1,28 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import { Payment } from "@/types";
 import { formatNaira, formatFriendlyDateTime } from "@/lib/utils";
-import { CheckCircle2, Clock, Landmark, CreditCard, Banknote, Smartphone } from "lucide-react";
+import { deletePaymentAction } from "@/actions/agreements";
+import {
+  CheckCircle2,
+  Clock,
+  Landmark,
+  CreditCard,
+  Banknote,
+  Smartphone,
+  Trash2,
+  Loader2,
+} from "lucide-react";
 
 interface PaymentTimelineProps {
   payments: Payment[];
+  agreementId?: string;
 }
 
-export function PaymentTimeline({ payments }: PaymentTimelineProps) {
+export function PaymentTimeline({ payments, agreementId }: PaymentTimelineProps) {
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
   if (!payments || payments.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 p-8 text-center">
@@ -35,10 +50,31 @@ export function PaymentTimeline({ payments }: PaymentTimelineProps) {
     }
   };
 
+  const handleDelete = async (paymentId: string, currentAgreementId: string) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this payment entry? The agreement balance and status will automatically recalculate."
+    );
+    if (!confirmed) return;
+
+    setDeletingId(paymentId);
+    try {
+      await deletePaymentAction({
+        agreementId: currentAgreementId,
+        paymentId,
+      });
+    } catch (err: any) {
+      alert(err.message || "Failed to delete payment.");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   return (
     <div className="relative pl-6 sm:pl-8 space-y-6 before:absolute before:left-2.5 sm:before:left-3.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-800">
       {payments.map((p, index) => {
         const isLatest = index === 0;
+        const currentAgreementId = agreementId || p.agreement_id;
+
         return (
           <div key={p.id} className="relative group">
             {/* Timeline Node Icon */}
@@ -64,9 +100,26 @@ export function PaymentTimeline({ payments }: PaymentTimelineProps) {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                  {getMethodIcon(p.payment_method)}
-                  <span>{p.payment_method}</span>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                    {getMethodIcon(p.payment_method)}
+                    <span>{p.payment_method}</span>
+                  </div>
+
+                  {/* Delete / Mistake Correction Button */}
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(p.id, currentAgreementId)}
+                    disabled={deletingId === p.id}
+                    title="Delete Mistaken Payment Entry"
+                    className="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+                  >
+                    {deletingId === p.id ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin text-rose-500" />
+                    ) : (
+                      <Trash2 className="h-3.5 w-3.5" />
+                    )}
+                  </button>
                 </div>
               </div>
 

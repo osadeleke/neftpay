@@ -1,25 +1,25 @@
 import React from "react";
 import { getSession } from "@/lib/auth/session";
-import { logoutAction, loginAsDemoMerchantAction } from "@/actions/auth";
-import Link from "next/link";
+import { logoutAction } from "@/actions/auth";
+import { StoreProfileForm } from "@/components/settings/store-profile-form";
 import {
-  Store,
-  Phone,
-  Mail,
-  ShieldCheck,
-  LogOut,
-  Sparkles,
   MessageCircle,
   HelpCircle,
-  MapPin,
+  Mail,
+  LogOut,
   ChevronRight,
-  ShieldAlert,
-  Smartphone,
   Share2,
+  ShieldCheck,
 } from "lucide-react";
 
 export default async function SettingsPage() {
   const session = await getSession();
+
+  // Support endpoints configured as requested (without exposing raw contact info in UI text)
+  const whatsappSupportUrl =
+    "https://wa.me/2348052215683?text=Hello%20NEFTrack%20Support,%20I%20need%20help%20with%20my%20store%20ledger";
+  const emailSupportUrl =
+    "mailto:hello@the984group@gmail.com,the984group@gmail.com?subject=NEFTrack%20Merchant%20Support";
 
   return (
     <div className="space-y-5">
@@ -33,61 +33,11 @@ export default async function SettingsPage() {
         </p>
       </div>
 
-      {/* Merchant Profile Card */}
-      <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        <div className="flex items-center gap-3.5 pb-4 border-b border-slate-100 dark:border-slate-800">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-600/30">
-            <Store className="h-6 w-6" />
-          </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                {session?.business_name || "Adebayo Electronics & Solar"}
-              </h3>
-              <ShieldCheck className="h-4 w-4 text-emerald-500" />
-            </div>
-            <div className="flex items-center gap-1 text-xs text-slate-400 mt-0.5">
-              <MapPin className="h-3 w-3 text-emerald-600" />
-              <span>Computer Village, Ikeja, Lagos</span>
-            </div>
-          </div>
-        </div>
+      {/* Interactive Store Profile Card (Editable) */}
+      <StoreProfileForm session={session} />
 
-        <div className="mt-4 space-y-3 text-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-slate-400 flex items-center gap-1.5">
-              <Phone className="h-3.5 w-3.5" />
-              WhatsApp Store Contact:
-            </span>
-            <span className="font-semibold text-slate-800 dark:text-slate-200 font-mono">
-              {session?.phone_number || "08035552341"}
-            </span>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <span className="text-slate-400 flex items-center gap-1.5">
-              <Mail className="h-3.5 w-3.5" />
-              Store Email:
-            </span>
-            <span className="font-semibold text-slate-800 dark:text-slate-200">
-              {session?.email || "adebayo@electronics.ng"}
-            </span>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <span className="text-slate-400 flex items-center gap-1.5">
-              <Sparkles className="h-3.5 w-3.5" />
-              Merchant Plan:
-            </span>
-            <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold text-[11px]">
-              SME Free Forever (Zero Cost)
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* WhatsApp Receipt & Messaging Module */}
-      <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      {/* WhatsApp Receipt Defaults */}
+      <div className="rounded-3xl border border-slate-200/90 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
           <MessageCircle className="h-4 w-4 text-[#25D366]" />
           <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -96,50 +46,72 @@ export default async function SettingsPage() {
         </div>
 
         <div className="mt-3.5 space-y-3 text-xs">
-          <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 text-slate-600 dark:text-slate-300">
+          <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 text-slate-600 dark:text-slate-300">
             <div className="font-semibold text-slate-800 dark:text-slate-200 mb-1 flex items-center gap-1.5">
               <Share2 className="h-3.5 w-3.5 text-emerald-600" />
-              Default Customer Receipt Template:
+              Customer Receipt Template:
             </div>
             <p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400 font-mono">
-              &quot;Hello &#123;customer&#125;, here is your live payment receipt for &#123;item&#125; at {session?.business_name || "Adebayo Electronics"}. Remaining balance: ₦&#123;balance&#125;. Track your installments: &#123;magic_link&#125;&quot;
+              &quot;Hello &#123;customer&#125;, here is your live payment receipt for &#123;item&#125; at {session?.business_name || "your store"}. Remaining balance: ₦&#123;balance&#125;. Track your installments: &#123;magic_link&#125;&quot;
             </p>
           </div>
 
           <div className="flex items-center justify-between pt-1">
             <span className="text-slate-500 dark:text-slate-400">Currency Precision:</span>
             <span className="font-semibold text-slate-800 dark:text-slate-200">
-              Nigerian Naira (₦) • Kobo Accuracy
+              Nigerian Naira (₦) • Integer Kobo Precision
             </span>
           </div>
 
           <div className="flex items-center justify-between">
-            <span className="text-slate-500 dark:text-slate-400">Delivery Channel:</span>
-            <span className="font-bold text-[#128C7E] dark:text-[#25D366]">
-              Direct WhatsApp (No SMS Fees)
+            <span className="text-slate-500 dark:text-slate-400">Delivery Channels:</span>
+            <span className="font-bold text-[#128C7E] dark:text-[#00D084]">
+              Direct WhatsApp & Cloudflare Email
             </span>
           </div>
         </div>
       </div>
 
-      {/* Support & Merchant Help */}
-      <div className="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      {/* Support & Merchant Help (Points directly to specified support channels) */}
+      <div className="rounded-3xl border border-slate-200/90 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 space-y-2">
         <a
-          href="https://wa.me/2348000000000?text=Hello%20NEFTrack%20Support,%20I%20need%20help%20with%20my%20installment%20ledger"
+          href={whatsappSupportUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-emerald-600 transition-colors"
+          className="flex items-center justify-between p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors"
         >
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-[#00D084]">
               <HelpCircle className="h-4 w-4" />
             </div>
             <div>
-              <div className="font-bold text-slate-900 dark:text-white">
-                Contact NEFTrack Merchant Support
+              <div className="text-xs font-bold text-slate-900 dark:text-white">
+                Contact Support via WhatsApp
               </div>
-              <div className="text-[11px] text-slate-400 font-normal">
-                Quick WhatsApp help & feature requests
+              <div className="text-[11px] text-slate-400">
+                Direct WhatsApp merchant assistance & ledger inquiries
+              </div>
+            </div>
+          </div>
+          <ChevronRight className="h-4 w-4 text-slate-400" />
+        </a>
+
+        <div className="border-t border-slate-100 dark:border-slate-800/80" />
+
+        <a
+          href={emailSupportUrl}
+          className="flex items-center justify-between p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-500/10 text-teal-600 dark:text-teal-400">
+              <Mail className="h-4 w-4" />
+            </div>
+            <div>
+              <div className="text-xs font-bold text-slate-900 dark:text-white">
+                Email Merchant Support
+              </div>
+              <div className="text-[11px] text-slate-400">
+                Send formal support request or report an issue
               </div>
             </div>
           </div>
@@ -147,49 +119,15 @@ export default async function SettingsPage() {
         </a>
       </div>
 
-      {/* Super-Admin Platform Portal (Discreet Founder Access) */}
-      <div className="rounded-2xl border border-amber-200/80 bg-amber-50/60 dark:border-amber-900/60 dark:bg-amber-950/20 p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500 text-white shadow-sm">
-              <ShieldAlert className="h-4 w-4" />
-            </div>
-            <div>
-              <div className="text-xs font-bold text-amber-900 dark:text-amber-200">
-                Platform Founder / Owner
-              </div>
-              <div className="text-[11px] text-amber-800/80 dark:text-amber-300/80">
-                View platform-wide GMV, money received & all merchants
-              </div>
-            </div>
-          </div>
-          <Link
-            href="/admin"
-            className="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-sm transition-all"
-          >
-            Admin Portal
-          </Link>
-        </div>
-      </div>
-
-      {/* Account Actions */}
-      <div className="space-y-2 pt-1">
-        <form action={loginAsDemoMerchantAction}>
-          <button
-            type="submit"
-            className="w-full h-11 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 transition-colors flex items-center justify-center gap-2"
-          >
-            <span>Reset Demo Store (Adebayo Electronics)</span>
-          </button>
-        </form>
-
+      {/* Sign Out Button */}
+      <div className="pt-2">
         <form action={logoutAction}>
           <button
             type="submit"
-            className="w-full h-11 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 dark:bg-rose-950/40 dark:border-rose-900/60 dark:text-rose-300 text-xs font-bold transition-colors flex items-center justify-center gap-2"
+            className="w-full h-12 rounded-2xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 dark:bg-rose-950/40 dark:border-rose-900/60 dark:text-rose-300 text-xs font-bold transition-colors flex items-center justify-center gap-2 active:scale-[0.98]"
           >
             <LogOut className="h-4 w-4" />
-            <span>Sign Out</span>
+            <span>Sign Out of Store</span>
           </button>
         </form>
       </div>

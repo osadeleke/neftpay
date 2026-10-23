@@ -339,3 +339,36 @@ export function getPaymentReceiptEmailHtml(params: {
     contentHtml: content,
   });
 }
+
+// 4. One-Time Passcode (OTP) Email Template for Secure Store Sign In
+export function getLoginOtpEmailHtml(params: {
+  code: string;
+  businessName?: string;
+}): string {
+  const content = `
+    <h2 class="heading">Your Store Login Code 🔐</h2>
+    <p class="text">
+      Hello${params.businessName ? ` <strong>${params.businessName}</strong>` : ""}, use the 6-digit one-time passcode below to verify your identity and access your store ledger:
+    </p>
+
+    <div style="background-color:#101827; border: 2px dashed #00D084; border-radius: 16px; padding: 24px; text-align: center; margin: 24px 0;">
+      <span style="font-family: monospace; font-size: 34px; font-weight: 800; letter-spacing: 8px; color: #00D084;">
+        ${params.code}
+      </span>
+      <p style="color: #94A3B8; font-size: 11px; margin-top: 10px; margin-bottom: 0;">
+        Valid for 10 minutes. Do not share this code with anyone.
+      </p>
+    </div>
+
+    <p class="text" style="font-size: 12px; color: #64748B;">
+      If you did not attempt to sign in to NEFTrack, you can safely disregard this message.
+    </p>
+  `;
+
+  return wrapEmailHtml({
+    title: `NEFTrack Login Code: ${params.code}`,
+    previewText: `Your 6-digit login verification code is ${params.code}. Valid for 10 minutes.`,
+    contentHtml: content,
+  });
+}
+

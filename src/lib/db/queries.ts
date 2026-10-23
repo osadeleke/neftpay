@@ -259,7 +259,8 @@ export async function getMagicLinkData(slug: string): Promise<MagicLinkData | nu
         m.id AS merchant_id,
         m.business_name AS merchant_business_name,
         m.phone_number AS merchant_phone,
-        m.email AS merchant_email
+        m.email AS merchant_email,
+        m.address AS merchant_address
       FROM Agreements a
       JOIN Merchants m ON a.merchant_id = m.id
       JOIN Clients c ON a.client_id = c.id
@@ -311,6 +312,7 @@ export async function getMagicLinkData(slug: string): Promise<MagicLinkData | nu
       business_name: row.merchant_business_name,
       phone_number: row.merchant_phone,
       email: row.merchant_email,
+      address: row.merchant_address || null,
     },
     payments,
     totalPaidKobo: totalPaid,
@@ -547,6 +549,137 @@ export async function updateMerchantProfile(
     )
     .bind(businessName.trim(), phoneNumber.trim(), merchantId)
     .run();
+}
+
+export async function updateAgreement(params: {
+  merchantId: string;
+  agreementId: string;
+  title: string;
+  totalAmountKobo: number;
+  dueDate?: string;
+  notes?: string;
+  clientName: string;
+  clientPhone: string;
+  clientEmail?: string;
+}): Promise<AgreementWithDetails> {
+  const db = getD1Database();
+
+  const existing = await db
+    .prepare("SELECT * FROM Agreements WHERE id = ? AND merchant_id = ?")
+    .bind(params.agreementId, params.merchantId)
+    .first<any>();
+
+  if (!existing) {
+    throw new Error("Agreement not found or unauthorized.");
+  }
+
+  // 1. Update Client info
+  await db
+    .prepare("UPDATE Clients SET full_name = ?, phone_number = ?, email = ? WHERE id = ? AND merchant_id = ?")
+    .bind(
+      params.clientName.trim(),
+      params.clientPhone.trim(),
+      params.clientEmail?.trim() || null,
+      existing.client_id,
+      params.merchantId
+    )
+    .run();
+
+  // 2. Calculate payments to re-assess status
+  const paymentsRes = await db
+    .prepare("SELECT COALESCE(SUM(amount), 0) AS total_paid FROM Payments WHERE agreement_id = ?")
+    .bind(params.agreementId)
+    .first<{ total_paid: number }>();
+
+  const totalPaid = Number(paymentsRes?.total_paid || 0);
+  const now = new Date().toISOString();
+  let status = existing.status;
+
+  if (totalPaid >= params.totalAmountKobo) {
+    status = "completed";
+  } else if (params.dueDate && params.dueDate < now) {
+    status = "overdue";
+  } else {
+    status = "active";
+  }
+
+  // 3. Update Agreement
+  await db
+    .prepare(
+      `UPDATE Agreements
+       SET title = ?, total_amount = ?, due_date = ?, notes = ?, status = ?, updated_at = ?
+       WHERE id = ? AND merchant_id = ?`
+    )
+    .bind(
+      params.title.trim(),
+      params.totalAmountKobo,
+      params.dueDate || null,
+      params.notes?.trim() || null,
+      status,
+      now,
+      params.agreementId,
+      params.merchantId
+    )
+    .run();
+
+  const full = await getAgreementById(params.merchantId, params.agreementId);
+  if (!full) {
+    throw new Error("Failed to load updated agreement.");
+  }
+  return full.agreement;
+}
+
+export async function deletePayment(params: {
+  merchantId: string;
+  agreementId: string;
+  paymentId: string;
+}): Promise<{ success: boolean; agreement: AgreementWithDetails }> {
+  const db = getD1Database();
+
+  // Verify ownership
+  const agreement = await db
+    .prepare("SELECT * FROM Agreements WHERE id = ? AND merchant_id = ?")
+    .bind(params.agreementId, params.merchantId)
+    .first<any>();
+
+  if (!agreement) {
+    throw new Error("Agreement not found or unauthorized.");
+  }
+
+  // Delete payment
+  await db
+    .prepare("DELETE FROM Payments WHERE id = ? AND agreement_id = ?")
+    .bind(params.paymentId, params.agreementId)
+    .run();
+
+  // Re-assess total paid and status
+  const paymentsRes = await db
+    .prepare("SELECT COALESCE(SUM(amount), 0) AS total_paid FROM Payments WHERE agreement_id = ?")
+    .bind(params.agreementId)
+    .first<{ total_paid: number }>();
+
+  const totalPaid = Number(paymentsRes?.total_paid || 0);
+  const totalAmount = Number(agreement.total_amount);
+  const now = new Date().toISOString();
+
+  let newStatus = "active";
+  if (totalPaid >= totalAmount) {
+    newStatus = "completed";
+  } else if (agreement.due_date && agreement.due_date < now) {
+    newStatus = "overdue";
+  }
+
+  await db
+    .prepare("UPDATE Agreements SET status = ?, updated_at = ? WHERE id = ?")
+    .bind(newStatus, now, params.agreementId)
+    .run();
+
+  const full = await getAgreementById(params.merchantId, params.agreementId);
+  if (!full) {
+    throw new Error("Failed to load updated agreement.");
+  }
+
+  return { success: true, agreement: full.agreement };
 }
 
 export async function getAdminPlatformMetrics(): Promise<AdminPlatformMetrics> {

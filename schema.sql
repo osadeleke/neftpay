@@ -8,8 +8,19 @@ CREATE TABLE IF NOT EXISTS Merchants (
     business_name TEXT NOT NULL,
     phone_number TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
+    password_hash TEXT,
+    address TEXT,
     subscription_tier TEXT NOT NULL DEFAULT 'free',
     currency TEXT NOT NULL DEFAULT 'NGN',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 1b. Verification Codes Table (For secure 6-digit Email OTP login)
+CREATE TABLE IF NOT EXISTS VerificationCodes (
+    id TEXT PRIMARY KEY,
+    email TEXT NOT NULL,
+    code TEXT NOT NULL,
+    expires_at DATETIME NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 

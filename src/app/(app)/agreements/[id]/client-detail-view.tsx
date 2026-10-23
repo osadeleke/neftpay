@@ -6,6 +6,7 @@ import { formatNaira, formatFriendlyDate } from "@/lib/utils";
 import { ShareModule } from "@/components/agreements/share-module";
 import { PaymentTimeline } from "@/components/agreements/payment-timeline";
 import { LogPaymentModal } from "@/components/agreements/log-payment-modal";
+import { EditAgreementModal } from "@/components/agreements/edit-agreement-modal";
 import { Badge } from "@/components/ui/badge";
 import { ProgressBar } from "@/components/ui/progress";
 import Link from "next/link";
@@ -13,11 +14,13 @@ import {
   ChevronLeft,
   User,
   Phone,
+  Mail,
   Calendar,
   AlertTriangle,
   CheckCircle2,
   PlusCircle,
   FileText,
+  Edit3,
 } from "lucide-react";
 
 interface ClientDetailViewProps {
@@ -27,6 +30,7 @@ interface ClientDetailViewProps {
 
 export function ClientDetailView({ agreement, payments }: ClientDetailViewProps) {
   const [isLogModalOpen, setIsLogModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const isCompleted = agreement.status === "completed" || agreement.balance_remaining <= 0;
   const isOverdue = agreement.status === "overdue";
@@ -43,19 +47,31 @@ export function ClientDetailView({ agreement, payments }: ClientDetailViewProps)
           <span>Ledger</span>
         </Link>
 
-        {isCompleted ? (
-          <Badge variant="completed" className="flex items-center gap-1">
-            <CheckCircle2 className="h-3 w-3" />
-            Fully Paid
-          </Badge>
-        ) : isOverdue ? (
-          <Badge variant="overdue" className="flex items-center gap-1">
-            <AlertTriangle className="h-3 w-3" />
-            Overdue
-          </Badge>
-        ) : (
-          <Badge variant="active">Active Plan</Badge>
-        )}
+        <div className="flex items-center gap-2">
+          {/* Edit Plan Button */}
+          <button
+            type="button"
+            onClick={() => setIsEditModalOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm"
+          >
+            <Edit3 className="h-3.5 w-3.5 text-emerald-600 dark:text-[#00D084]" />
+            <span>Edit Plan</span>
+          </button>
+
+          {isCompleted ? (
+            <Badge variant="completed" className="flex items-center gap-1">
+              <CheckCircle2 className="h-3 w-3" />
+              Fully Paid
+            </Badge>
+          ) : isOverdue ? (
+            <Badge variant="overdue" className="flex items-center gap-1">
+              <AlertTriangle className="h-3 w-3" />
+              Overdue
+            </Badge>
+          ) : (
+            <Badge variant="active">Active Plan</Badge>
+          )}
+        </div>
       </div>
 
       {/* Item & Customer Header */}
@@ -72,6 +88,12 @@ export function ClientDetailView({ agreement, payments }: ClientDetailViewProps)
             <Phone className="h-3.5 w-3.5" />
             {agreement.client_phone}
           </span>
+          {agreement.client_email && (
+            <span className="flex items-center gap-1">
+              <Mail className="h-3.5 w-3.5" />
+              {agreement.client_email}
+            </span>
+          )}
           {agreement.due_date && (
             <span className="flex items-center gap-1">
               <Calendar className="h-3.5 w-3.5" />
@@ -81,11 +103,11 @@ export function ClientDetailView({ agreement, payments }: ClientDetailViewProps)
         </div>
       </div>
 
-      {/* 1. Share Module Card (Requirement 3: Screen 3) */}
+      {/* 1. Share Module Card */}
       <ShareModule agreement={agreement} />
 
       {/* Financial Overview Card */}
-      <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <div className="rounded-3xl border border-slate-200/90 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div className="flex items-baseline justify-between">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
             Installment Progress
@@ -131,19 +153,19 @@ export function ClientDetailView({ agreement, payments }: ClientDetailViewProps)
         )}
       </div>
 
-      {/* 2. Vertical Timeline Component: Payment History (Requirement 3: Screen 3) */}
+      {/* 2. Vertical Timeline Component: Payment History */}
       <div className="space-y-3 pt-2">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-bold text-slate-900 dark:text-white">
             Payment History ({payments.length})
           </h3>
-          <span className="text-xs text-slate-400">Latest first</span>
+          <span className="text-xs text-slate-400">Click trash to correct mistake</span>
         </div>
 
-        <PaymentTimeline payments={payments} />
+        <PaymentTimeline payments={payments} agreementId={agreement.id} />
       </div>
 
-      {/* 3. Sticky Footer Button spanning 100% width: "Log New Payment" (Requirement 3: Screen 3) */}
+      {/* 3. Sticky Footer Button: "Log New Payment" */}
       <div className="fixed bottom-0 left-0 right-0 z-30 mx-auto max-w-md p-4 bg-white/90 dark:bg-[#0B111E]/95 backdrop-blur-xl border-t border-slate-200/70 dark:border-slate-800/80 shadow-[0_-8px_30px_rgba(0,0,0,0.08)]">
         <button
           onClick={() => setIsLogModalOpen(true)}
@@ -154,10 +176,17 @@ export function ClientDetailView({ agreement, payments }: ClientDetailViewProps)
         </button>
       </div>
 
-      {/* Numeric Keypad Modal */}
+      {/* Log Payment Modal */}
       <LogPaymentModal
         isOpen={isLogModalOpen}
         onClose={() => setIsLogModalOpen(false)}
+        agreement={agreement}
+      />
+
+      {/* Edit Agreement Modal */}
+      <EditAgreementModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
         agreement={agreement}
       />
     </div>

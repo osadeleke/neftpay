@@ -77,9 +77,15 @@ export function ReceiptView({ data }: ReceiptViewProps) {
                   <ShieldCheck className="h-4 w-4 text-emerald-500 shrink-0" />
                 </span>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Official Digital Installment Receipt
-              </p>
+              {merchant.address ? (
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">
+                  {merchant.address}
+                </p>
+              ) : (
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Official Digital Installment Receipt
+                </p>
+              )}
             </div>
           </div>
 

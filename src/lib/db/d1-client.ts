@@ -167,6 +167,24 @@ class LocalSqliteD1Client implements D1Database {
         const sql = fs.readFileSync(schemaPath, "utf-8");
         this.db.exec(sql);
       }
+      // Safe migrations for newly added columns if table already existed
+      try {
+        this.db.exec("ALTER TABLE Merchants ADD COLUMN password_hash TEXT;");
+      } catch {}
+      try {
+        this.db.exec("ALTER TABLE Merchants ADD COLUMN address TEXT;");
+      } catch {}
+      try {
+        this.db.exec(`
+          CREATE TABLE IF NOT EXISTS VerificationCodes (
+            id TEXT PRIMARY KEY,
+            email TEXT NOT NULL,
+            code TEXT NOT NULL,
+            expires_at DATETIME NOT NULL,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+          );
+        `);
+      } catch {}
       this.initialized = true;
     } catch (err) {
       console.warn("Schema initialization notice:", err);

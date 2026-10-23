@@ -15,6 +15,7 @@ export async function createSessionToken(user: SessionUser): Promise<string> {
     name: user.name,
     business_name: user.business_name,
     phone_number: user.phone_number,
+    address: user.address || null,
   })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
@@ -31,6 +32,7 @@ export async function verifySessionToken(token: string): Promise<SessionUser | n
       name: (payload.name as string) || (payload.business_name as string),
       business_name: payload.business_name as string,
       phone_number: payload.phone_number as string,
+      address: (payload.address as string) || null,
     };
   } catch {
     return null;

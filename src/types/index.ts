@@ -5,6 +5,7 @@ export interface Merchant {
   business_name: string;
   phone_number: string;
   email: string;
+  address?: string | null;
   subscription_tier: SubscriptionTier;
   currency?: string;
   created_at?: string;
@@ -80,6 +81,7 @@ export interface MagicLinkData {
     business_name: string;
     phone_number: string;
     email: string;
+    address?: string | null;
   };
   payments: Payment[];
   totalPaidKobo: number;
@@ -94,6 +96,7 @@ export interface SessionUser {
   name: string;
   business_name: string;
   phone_number: string;
+  address?: string | null;
 }
 
 export interface AdminMerchantMetric {
