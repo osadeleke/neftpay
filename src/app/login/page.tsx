@@ -82,7 +82,7 @@ function LoginFormInner() {
       });
 
       if (res.success) {
-        router.push("/dashboard");
+        window.location.href = "/dashboard";
       } else {
         setError(res.error || "Failed to register store.");
       }
@@ -110,7 +110,7 @@ function LoginFormInner() {
       });
 
       if (res.success) {
-        router.push("/dashboard");
+        window.location.href = "/dashboard";
       } else {
         setError(res.error || "Failed to sign in.");
         if (res.notFound) {
@@ -167,7 +167,7 @@ function LoginFormInner() {
       });
 
       if (res.success) {
-        router.push("/dashboard");
+        window.location.href = "/dashboard";
       } else {
         setError(res.error || "Invalid or expired verification code.");
       }
